@@ -11,17 +11,24 @@ export async function getItems({
   count: number;
 }) {
   //given a story, get that number of questions
-
+  try {
   return await prisma.item.findMany({
       where: {
           storyId,
       },
       select: {
             question: true,
-            options: true,
+            options: true
       },
       take: count,
   });
+    
+  } catch (error) {
+    console.error(error);
+    return undefined;
+    
+  }
+
 }
 
 export async function getRandomStory() {
