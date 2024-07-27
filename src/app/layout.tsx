@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "@/components/ui/navigation-menu";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +27,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <NavigationMenu className="w-screen ">
+          <NavigationMenuList className="p-5 w-screen bg-slate-200 flex gap-8">
+            <NavigationMenuItem className="hover:bg-slate-50">
+              <Link href="/">Home</Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem className="hover:bg-slate-50">
+              <Link href="/results">Results</Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+
+        {children}
+      </body>
     </html>
   );
 }
