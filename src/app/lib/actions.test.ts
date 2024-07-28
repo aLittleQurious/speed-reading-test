@@ -22,6 +22,11 @@ test("get questions correctly", async () => {
 
 
   const response = await getItems({storyId: "dummy-story-id", count: 2});
+
+  if(!response) { 
+    throw new Error("response is undefined");
+  }
+
   //list of 
   expect(response[0]).toHaveProperty("options")
   expect(response[0]).toHaveProperty("question")

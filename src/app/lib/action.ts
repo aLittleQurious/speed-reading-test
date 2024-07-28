@@ -2,7 +2,6 @@
 import prisma from "./prisma";
 import random from "random";
 
-
 export async function getItems({
   storyId,
   count,
@@ -12,38 +11,20 @@ export async function getItems({
 }) {
   //given a story, get that number of questions
   try {
-  return await prisma.item.findMany({
+    return await prisma.item.findMany({
       where: {
-          storyId,
+        storyId,
       },
       select: {
-            question: true,
-            options: true
+        question: true,
+        options: true,
       },
       take: count,
-  });
-    
+    });
   } catch (error) {
     console.error(error);
     return undefined;
-    
   }
-
-}
-
-export async function getRandomStory() {
-  const randomStory: any[] =
-    await prisma.$queryRaw`SELECT * FROM "Story" ORDER BY RANDOM() LIMIT 1`;
-
-  return randomStory[0];
-}
-
-export async function getStory({ id }: { id: string }) {
-  return await prisma.story.findUnique({
-    where: {
-      id,
-    },
-  });
 }
 
 export async function checkAnswers({
@@ -53,8 +34,26 @@ export async function checkAnswers({
 }: {
   storyId: string;
   submissions: string[];
-  timeToComplete?: Date;
+  timeToComplete: number; //assume in seconds
 }) {
+  //get story length
+  const storyLength = await prisma.story.findUnique({
+    where: {
+      id: storyId,
+    },
+    select: {
+      length: true,
+    },
+  });
+
+  if (!storyLength) {
+    return {
+      numQuestions: 0,
+      numCorrect: 0,
+      wpm: 0,
+    };
+  }
+
   //get all answers for the story
   const items = await prisma.item.findMany({
     where: {
@@ -63,6 +62,8 @@ export async function checkAnswers({
   });
 
   const answers = items.map((item) => item.answer);
+  console.log(answers)
+  console.log(submissions)
   //for every submission, if submission in answers, increment score
   let score = 0;
   let total = 0;
@@ -77,8 +78,6 @@ export async function checkAnswers({
   return {
     numQuestions: total,
     numCorrect: score,
-    wpm: timeToComplete
-      ? Math.floor((total / (timeToComplete.getTime() / 1000 / 60)) * 60)
-      : 0,
+    wpm: timeToComplete ? storyLength.length / (timeToComplete / 60) : 0,
   };
 }
