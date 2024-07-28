@@ -8,7 +8,7 @@ export default async function Results() {
 
   const data = jwt.decode(cookieResponse?.value ?? "");
 
-  if (!cookieResponse) {
+  if (!cookieResponse || typeof data === "string") {
     return (
       <main className="flex min-h-screen flex-col items-center gap-8 p-24">
         <div className="w-full flex flex-col items-center p-6 bg-slate-100 shadow-md rounded-lg">
