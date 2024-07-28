@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Formik } from "formik";
 import { useFormik } from "formik";
 import { checkAnswers } from "./lib/action";
+import clsx from "clsx";
+import { useRouter } from "next/navigation";
 
 async function clientGetRandomStory() {
   const response = await fetch("/api/getRandomStory");
@@ -13,6 +15,7 @@ async function clientGetRandomStory() {
 }
 
 export default function Home() {
+  const router = useRouter();
   //We have 2 phases, reading and quizzing. isreading is the default state, and when the user clicks the start button, it will change to false.
 
   //state tracking
@@ -39,7 +42,6 @@ export default function Home() {
 
   const handleBeginReading = () => {
     setIsBlurred(false);
-    setIsReading(true);
     setStartTime(Date.now());
   };
 
@@ -59,31 +61,34 @@ export default function Home() {
   const formik = useFormik({
     initialValues: {},
     onSubmit: async (submissionDict: { [key: string]: string }) => {
-
-      alert(Object.keys(submissionDict));
       const result = await checkAnswers({
         storyId: data.id,
         submissions: Object.keys(submissionDict),
         timeToComplete: timeDifference,
       });
+      router.push("/results");
 
-      alert(JSON.stringify(result));
     },
   });
 
   //while reading, the user can click a button to start the quiz
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {JSON.stringify(data)}
+    <main className="flex min-h-screen flex-col items-center gap-8 p-24">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4 text-center">
+        Click Below to Begin!
+      </h1>
       {isReading && (
         <div
-          className={isBlurred ? "blur " : " " + "bg-slate-700"}
+          className={clsx(" w-full flex flex-col gap-8 items-center", {
+            "blur ": isBlurred,
+          })}
           onClick={handleBeginReading}
         >
           <StoryComponent
             title={data?.title || "Loading..."}
             storyText={data?.story || "Loading story..."}
+            className="text-center"
           />
           <Button
             className={isBlurred ? "hidden" : ""}
@@ -96,14 +101,13 @@ export default function Home() {
       {isQuizzing && (
         <div>
           <form onSubmit={formik.handleSubmit}>
-            <div className="flex flex-col items-center justify-center">
-              <h1 className="text-2xl font-bold text-black">
+            <div className="flex flex-col gap-4 justify-center w-full mx-auto p-6 bg-slate-100 shadow-md rounded-lg">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4 text-center">
                 Answer the following questions:
               </h1>
-              //map through the questions and options
               {data?.quiz.map((item: any, index: number) => {
                 return (
-                  <div key={index}>
+                  <div key={index} className="">
                     <h2>{item.question}</h2>
                     {item.options.map((option: string) => {
                       return (

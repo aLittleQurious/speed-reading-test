@@ -1,6 +1,9 @@
 "use server";
 import prisma from "./prisma";
 import random from "random";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function getItems({
   storyId,
@@ -62,8 +65,8 @@ export async function checkAnswers({
   });
 
   const answers = items.map((item) => item.answer);
-  console.log(answers)
-  console.log(submissions)
+  console.log(answers);
+  console.log(submissions);
   //for every submission, if submission in answers, increment score
   let score = 0;
   let total = 0;
@@ -75,9 +78,25 @@ export async function checkAnswers({
     total++;
   }
 
-  return {
+  const wpm = timeToComplete ? storyLength.length / (timeToComplete / 60) : 0;
+
+  //aggregate payload & sign it
+  const payload = {
     numQuestions: total,
     numCorrect: score,
-    wpm: timeToComplete ? storyLength.length / (timeToComplete / 60) : 0,
+    wpm: wpm.toFixed(0),
   };
+
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET not found in environment");
+  }
+
+  const signedPayload = jwt.sign(payload, process.env.JWT_SECRET);
+
+  //attach to session
+  cookies().set("quizResults", signedPayload);
+
+
+  //return payload natively
+  return payload;
 }

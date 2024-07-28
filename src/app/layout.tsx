@@ -30,16 +30,16 @@ export default function RootLayout({
       <body className={inter.className}>
         <NavigationMenu className="w-screen ">
           <NavigationMenuList className="p-5 w-screen bg-slate-200 flex gap-8">
-            <NavigationMenuItem className="hover:bg-slate-50">
+            <NavigationMenuItem className="hover:bg-slate-50 p-4 rounded-lg">
               <Link href="/">Home</Link>
             </NavigationMenuItem>
-            <NavigationMenuItem className="hover:bg-slate-50">
+            <NavigationMenuItem className="hover:bg-slate-50 p-4 rounded-lg">
               <Link href="/results">Results</Link>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
-        {children}
+        <div>{children}</div>
       </body>
     </html>
   );
