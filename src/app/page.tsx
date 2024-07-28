@@ -59,11 +59,11 @@ export default function Home() {
   const formik = useFormik({
     initialValues: {},
     onSubmit: async (submissionDict: { [key: string]: string }) => {
+
+      alert(Object.keys(submissionDict));
       const result = await checkAnswers({
         storyId: data.id,
-        submissions: Object.keys(submissionDict).map(
-          (key) => submissionDict[key]
-        ),
+        submissions: Object.keys(submissionDict),
         timeToComplete: timeDifference,
       });
 
@@ -113,7 +113,7 @@ export default function Home() {
                             id={option}
                             name={item.question}
                             onChange={formik.handleChange}
-                            value={2}
+                            value={item.option}
                           />
                           <label htmlFor={option}>{option}</label>
                         </div>
